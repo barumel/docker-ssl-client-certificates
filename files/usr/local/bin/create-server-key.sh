@@ -1,7 +1,6 @@
 #!/bin/bash
 set -ex;
 
-SSL_CA_DIR="/etc/ssl/ca"
 SSL_CERTS_DIR="$SSL_CA_DIR/certs"
 SSL_PRIVATE_DIR="$SSL_CA_DIR/private"
 SSL_CRL_DIR="$SSL_CA_DIR/crl"
