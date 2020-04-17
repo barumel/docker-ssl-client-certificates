@@ -16,12 +16,14 @@ ssl_verify_client on;
 Then link the file to the proxy container:
 
 ```
-./custom.conf:/etc/nginx/conf.d/my_proxy.conf:ro
+volumes:
+ - ./custom.conf:/etc/nginx/conf.d/my_proxy.conf:ro
 ```
 
 ### Openssl
 You can also overwrite the openssl configuration by linking an openssl.cnf file to both containers:
 
 ```
-./openssl.cnf:/etc/ssl/openssl.cnf
+volumes:
+ - ./openssl.cnf:/etc/ssl/openssl.cnf
 ```
