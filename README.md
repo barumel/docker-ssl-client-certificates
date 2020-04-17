@@ -8,12 +8,24 @@ To use it, create a volume that holds the data from SSL_CA_DIR and link it to yo
 # Usage
 See the provided docker-compose.yml file for a usage example.
 
+
+## Volume
 To use the genreted ssl certificates, link the SSL_CA_DIR into your container.
 
 ```
 volumes:
  - ca:/etc/ssl/ca
 ```
+
+
+## Nginx configuration
+Add the following lines to your nginx configuration file:
+
+```
+ssl_client_certificate /etc/ssl/ca/certs/ca.crt;
+ssl_verify_client on;
+```
+
 
 # Enviroment variables
 ```
