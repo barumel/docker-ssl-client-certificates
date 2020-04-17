@@ -1,0 +1,21 @@
+version: '3.1'
+
+services:
+  client-certificates:
+    image: barumel/nginx-client-certificates:latest
+    environment:
+      - "PASSPHRASE=MySuperSecurePassphrase"
+      - "COUNTRY=CH"
+      - "STATE=Neuchatel"
+      - "LOCALITY=La Sagne"
+      - "ORGANIZATION=Example Org"
+      - "ORGANIZATIONAL_UNIT=Example Unit"
+      - "COMMON_NAME=example.ch"
+      - "SSL_CLIENT_CERTIFICATES_FOR=foo,bar"
+      - "SSL_CLIENT_PASSPHRASE=MySuperSecureClientPassphrase"
+    volumes:
+     - ca:/etc/ssl/ca
+     - ./certificates:/etc/ssl/ca/export
+
+volumes:
+  ca:
