@@ -1,87 +1,70 @@
 #!/bin/bash
-set -ex
+set -ex;
 
-SSL_CERTS_DIR="$SSL_CA_DIR/certs"
-SSL_PRIVATE_DIR="$SSL_CA_DIR/private"
-SSL_CRL_DIR="$SSL_CA_DIR/crl"
-SSL_CLIENT_CERTIFICATES_DIR="$SSL_CERTS_DIR/client"
+#!/bin/bash
+while getopts u:p: flag
+do
+    case "${flag}" in
+        u) user=${OPTARG};;
+        p) passphrase=${OPTARG};;
+    esac
+done
 
-SSL_CA_CERTIFICATE="$SSL_CERTS_DIR/ca.crt"
-SSL_CA_PRIVATE_KEY="$SSL_PRIVATE_DIR/private_ca.key"
-SSL_CA_KEY="$SSL_PRIVATE_DIR/ca.key"
-SSL_CA_CRL="$SSL_CRL_DIR/ca.crl"
-
-SSL_EXPORTS_DIR="$SSL_CA_DIR/export"
-
-
-ls -al $SSL_CERTS_DIR
-ls -al $SSL_CLIENT_CERTIFICATES_DIR
-
-display_help() {
-  echo "Usage: "
-  echo "-h / --help:        Show this message"
-  echo "-u / --user:        Username"
-  echo "-p / --passphrase:  Passph  rase for this certificate"
-}
-
-if [ "$1" == "-h" -o "$1" == "--help" ]; then
-  display_help
-  exit 0
+if [ -z "$user" ];
+then
+  echo "The parameter -u (usename) is required!";
+  exit;
 fi
 
-if [ "$#" -ne 4 ]; then
-  echo "You did not pass all required arguments!"
-  display_help
-  exit 1;
+if [ -z "$passphrase" ];
+then
+  echo "No passphrase provided! Going to generate one for you..."
+  passphrase=$(openssl rand -base64 40)
 fi
 
-if [ "$1" == "-u" -o "$1" == "--user" ]; then
-  USER=$2
-  PASSPHRASE=$4
-else
-  USER=$4
-  PASSPHRASE=$2
-fi
+# Generate the private key
+openssl genpkey \
+  -algorithm RSA \
+  -pkeyopt rsa_keygen_bits:4096 \
+  -aes-128-cbc \
+  -out /srv/certificates/client/${user}.key \
+  -pass pass:${passphrase}
 
-# Create the Client Key and CSR
-openssl genrsa \
-  -des3 \
-  -out $SSL_CLIENT_CERTIFICATES_DIR/${USER}.key \
-  -passout pass:${PASSPHRASE} 4096
 
+# Create the csr
 openssl req \
   -new \
-  -key $SSL_CLIENT_CERTIFICATES_DIR/${USER}.key \
-  -out $SSL_CLIENT_CERTIFICATES_DIR/${USER}.csr \
-  -passin pass:${PASSPHRASE} \
-  -subj "/C=${COUNTRY}/ST=${STATE}/L=${LOCALITY}/O=${USER}/OU=${ORGANIZATIONAL_UNIT}/CN=${USER}"
-
-
-#  -CAserial /etc/ssl/ca/crlnumber \
-#  -CAcreateserial \
+  -config /srv/certificates/config/client-req.cnf \
+  -key /srv/certificates/client/${user}.key \
+  -out /srv/certificates/client/${user}.csr \
+  -passin pass:${passphrase}
 
 # Sign the client certificate with our CA cert.
-openssl x509 \
+# -rand_serial seems not to work...
+openssl \
+  x509 \
   -req \
-  -days $SSL_CLIENT_CERT_DURATION \
-  -in $SSL_CLIENT_CERTIFICATES_DIR/${USER}.csr \
-  -CA $SSL_CA_CERTIFICATE \
-  -CAkey $SSL_CA_KEY \
-  -set_serial 01 \
-  -out $SSL_CLIENT_CERTIFICATES_DIR/${USER}.crt \
-  -passin file:/tmp/passphrase.txt
+  -days $CERTIFICATES_SERVER_CERTIFY_DAYS \
+  -in /srv/certificates/client/${user}.csr \
+  -CA /srv/certificates/server/server.crt \
+  -CAkey /srv/certificates/server/private.key \
+  -set_serial 0x"$(openssl rand -hex 16)" \
+  -out /srv/certificates/client/${user}.crt \
+  -passin file:/srv/certificates/server/passphrase.txt \
+  -extensions client_extensions \
+  -extfile /srv/certificates/config/client-req.cnf
 
-echo "making p12 file"
-#browsers need P12s (contain key and cert)
+# Create p12 as browsers need P12s (contain key and cert)
 openssl pkcs12 \
   -export \
   -clcerts \
-  -in $SSL_CLIENT_CERTIFICATES_DIR/${USER}.crt \
-  -inkey $SSL_CLIENT_CERTIFICATES_DIR/${USER}.key \
-  -out $SSL_CLIENT_CERTIFICATES_DIR/${USER}.p12 \
-  -passin pass:${PASSPHRASE} \
-  -passout pass:${PASSPHRASE}
+  -in /srv/certificates/client/${user}.crt \
+  -inkey /srv/certificates/client/${user}.key \
+  -out /srv/certificates/client/${user}.p12 \
+  -passin pass:${passphrase} \
+  -passout pass:${passphrase}
 
-cp $SSL_CLIENT_CERTIFICATES_DIR/${USER}.p12 $SSL_EXPORTS_DIR
 
-echo "Created /etc/ssl/export/${USER}.p12"
+  echo "Client Certificate created for user ${user}"
+  echo "Passphrase: ${passphrase}"
+

@@ -1,0 +1,42 @@
+# https://datacadamia.com/web/server/nginx/client_authentication
+# https://www.feistyduck.com/library/openssl-cookbook/online/
+[req]
+prompt = no
+distinguished_name = dn
+
+[dn]
+C = ${ENV::CERTIFICATES_SERVER_COUNTRY}
+ST = ${ENV::CERTIFICATES_SERVER_STATE}
+L = ${ENV::CERTIFICATES_SERVER_LOCALITY}
+O = ${ENV::CERTIFICATES_SERVER_ORGANIZATION}
+OU = ${ENV::CERTIFICATES_SERVER_ORGANIZATIONAL_UNIT}
+CN = ${ENV::CERTIFICATES_SERVER_COMMON_NAME}
+
+[client_extensions]
+# List of extensions to add to certificate generated
+# It can be overridden by the -extensions command line switch.
+# See the (`man x509v3_config`) manual page for details of the extension section format.
+# See https://www.openssl.org/docs/man1.0.2/man5/x509v3_config.html
+# for explanation
+# A CA certificate must contains: CA: true
+basicConstraints = critical, CA:false
+
+# Purposes for which the certificate public key can be used for
+# object short names or the dotted numerical form of OIDs (object identifier)
+# OpenSSL has an internal table of OIDs that are generated when the library is built, and their corresponding NIDs are available as defined constants
+# For example the OID for commonName has the following definitions:
+#  * SN_commonName                   "CN"
+#  * LN_commonName                   "commonName"
+#  * NID_commonName                  13
+#
+# Example: new dotted NID object initialization
+# int new_nid = OBJ_create("1.2.3.4", "NewOID", "New Object Identifier");
+# ASN1_OBJECT *obj = OBJ_nid2obj(new_nid);
+keyUsage = critical, digitalSignature
+
+# Used for client auth / email protection
+extendedKeyUsage=clientAuth
+
+# as seen https://www.openssl.org/docs/man1.0.2/man1/openssl-req.html under v3_ca example
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer:always
