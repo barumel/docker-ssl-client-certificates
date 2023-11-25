@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
   client-certificates:
-    image: barumel/nginx-client-certificates:latest
+    image: barumel/docker-ssl-client-certificates:latest
     build:
       context: ./
       dockerfile: Dockerfile
