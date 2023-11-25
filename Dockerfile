@@ -1,42 +1,30 @@
-FROM alpine:latest
+FROM debian:latest
 
-ENV PASSPHRASE MwpHtTSDaEcAxkXGQyPtaGm5
-ENV COUNTRY CH
-ENV STATE Neuchatel
-ENV LOCALITY La Sagne
-ENV ORGANIZATION Example Org
-ENV ORGANIZATIONAL_UNIT Example Unit
-ENV COMMON_NAME example.ch
-ENV SSL_CLIENT_CERTIFICATES_FOR foo,bar
-ENV SSL_SERVER_CERT_DURATION 365
-ENV SSL_CLIENT_CERT_DURATION 365
-ENV SSL_CLIENT_PASSPHRASE Ku7vLMPdWEpcJsZMGgqHmyKg
-ENV SSL_CA_DIR /etc/ssl/ca
+ENV DEBIAN_FRONTEND noninteractive
 
-RUN mkdir -p /tmp/export
-RUN mkdir -p /etc/ssl/ca
-RUN mkdir -p /etc/ssl/ca/private
-RUN mkdir -p /etc/ssl/ca/certs
-RUN mkdir -p /etc/ssl/ca/certs/client
-RUN mkdir -p /etc/ssl/ca/crl
-RUN mkdir -p /etc/ssl/ca/new-certs
-RUN mkdir -p /etc/ssl/ca/export
+# Add user
+RUN useradd --no-create-home keymaster
 
-RUN touch /etc/ssl/ca/index.txt
-
+# Install dependencies
 RUN set -ex; \
-  apk update; \
-  apk add \
+  apt-get update; \
+  apt-get install -y \
     openssl \
-    bash \
     vim
 
+# Create necessary directories
+RUN mkdir -p /srv/certificates/bin
+RUN mkdir -p /srv/certificates/client
+RUN mkdir -p /srv/certificates/server
+# Copy files
 COPY files /
 
-RUN chmod +x /usr/local/bin/*
+# Change owner
+RUN chown -R keymaster:keymaster /srv/certificates
 
-RUN ls -al /usr/local/bin
+# Make bin scrips executable
+RUN chmod +x /srv/certificates/bin*
 
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+USER keymaster
 
-CMD tail -f /dev/null
+ENTRYPOINT ["/srv/certificates/bin/docker-entrypoint.sh"]

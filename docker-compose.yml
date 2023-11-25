@@ -3,19 +3,20 @@ version: '3.1'
 services:
   client-certificates:
     image: barumel/nginx-client-certificates:latest
+    build:
+      context: ./
+      dockerfile: Dockerfile
     environment:
-      - "PASSPHRASE=MySuperSecurePassphrase"
-      - "COUNTRY=CH"
-      - "STATE=Neuchatel"
-      - "LOCALITY=La Sagne"
-      - "ORGANIZATION=Example Org"
-      - "ORGANIZATIONAL_UNIT=Example Unit"
-      - "COMMON_NAME=example.ch"
-      - "SSL_CLIENT_CERTIFICATES_FOR=foo,bar"
-      - "SSL_CLIENT_PASSPHRASE=MySuperSecureClientPassphrase"
+      - "CERTIFICATES_SERVER_CERTIFY_DAYS=3650"
+      - "CERTIFICATES_SERVER_PASSPHRASE=MySuperSecurePassphrase"
+      - "CERTIFICATES_SERVER_COUNTRY=CH"
+      - "CERTIFICATES_SERVER_STATE=Neuchatel"
+      - "CERTIFICATES_SERVER_LOCALITY=La Sagne"
+      - "CERTIFICATES_SERVER_ORGANIZATION=Example Org"
+      - "CERTIFICATES_SERVER_ORGANIZATIONAL_UNIT=Example Unit"
+      - "CERTIFICATES_SERVER_COMMON_NAME=localhost"
     volumes:
-     - ca:/etc/ssl/ca
-     - ./certificates:/etc/ssl/ca/export
+     - certificates:/srv/certificates
 
 volumes:
-  ca:
+  certificates:

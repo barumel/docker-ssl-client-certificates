@@ -1,0 +1,31 @@
+# https://datacadamia.com/crypto/certificate/root
+# https://www.feistyduck.com/library/openssl-cookbook/online/
+[req]
+prompt = no
+distinguished_name = dn
+req_extensions = ext
+
+[dn]
+C = ${ENV::CERTIFICATES_SERVER_COUNTRY}
+ST = ${ENV::CERTIFICATES_SERVER_STATE}
+L = ${ENV::CERTIFICATES_SERVER_LOCALITY}
+O = ${ENV::CERTIFICATES_SERVER_ORGANIZATION}
+OU = ${ENV::CERTIFICATES_SERVER_ORGANIZATIONAL_UNIT}
+CN = ${ENV::CERTIFICATES_SERVER_COMMON_NAME}
+
+[ext]
+# A CA certificate must contains: CA: true
+# pathlen: 0 - the certificate can only be used to sign end user certificates and not further CAs.
+basicConstraints = critical, CA:true, pathlen:0
+
+# Key Usage
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+
+# Used to sign server or client auth
+extendedKeyUsage=serverAuth, clientAuth
+
+https://www.openssl.org/docs/man1.0.2/man5/x509v3_config.html
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid:always,issuer:always
+
+subjectAltName = ${ENV::CERTIFICATES_SERVER_SUBJECT_ALT_NAME}
