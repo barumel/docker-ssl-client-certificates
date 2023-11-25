@@ -37,6 +37,7 @@ openssl req \
   -passin pass:${passphrase}
 
 # Sign the client certificate with our CA cert.
+# -rand_serial seems not to work...
 openssl \
   x509 \
   -req \
@@ -45,7 +46,6 @@ openssl \
   -CA /srv/certificates/server/server.crt \
   -CAkey /srv/certificates/server/private.key \
   -set_serial 0x"$(openssl rand -hex 16)" \
-  # -rand_serial \
   -out /srv/certificates/client/${user}.crt \
   -passin file:/srv/certificates/server/passphrase.txt \
   -extensions client_extensions \
