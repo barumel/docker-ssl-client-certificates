@@ -2,7 +2,6 @@
 set -ex;
 
 #!/bin/bash
-
 while getopts u:p: flag
 do
     case "${flag}" in
@@ -17,7 +16,11 @@ then
   exit;
 fi
 
-pass=$passphrase || mkpasswd -l 30 -d 3 -C 5 -s 3
+if [ -z "$passphrase" ];
+then
+  echo "No passphrase provided! Going to generate one for you..."
+  passphrase=$(openssl rand -base64 40)
+fi
 
 # Generate the private key
 openssl genpkey \
@@ -62,6 +65,6 @@ openssl pkcs12 \
   -passout pass:${passphrase}
 
 
-  echo "Cleitn Certificate created for user ${user}"
+  echo "Client Certificate created for user ${user}"
   echo "Passphrase: ${passphrase}"
 
