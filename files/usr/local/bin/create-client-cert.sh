@@ -37,13 +37,16 @@ openssl req \
   -passin pass:${passphrase}
 
 # Sign the client certificate with our CA cert.
-openssl x509 \
+openssl \
+  x509 \
   -req \
   -days $CERTIFICATES_SERVER_CERTIFY_DAYS \
   -in /srv/certificates/client/${user}.csr \
   -CA /srv/certificates/server/server.crt \
   -CAkey /srv/certificates/server/private.key \
   -rand_serial \
+  -extensions client_extensions \
+  -extfile /srv/certificates/config/client-req.cnf \
   -out /srv/certificates/client/${user}.crt \
   -passin file:/srv/certificates/server/passphrase.txt
 

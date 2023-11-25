@@ -3,7 +3,6 @@
 [req]
 prompt = no
 distinguished_name = dn
-req_extensions = client_extensions
 
 [dn]
 C = ${ENV::CERTIFICATES_SERVER_COUNTRY}
