@@ -11,7 +11,8 @@ openssl genpkey \
 
 
 # Create the certificate for signing Client Certs
-openssl req \
+openssl \
+  req \
   -new \
   -x509 \
   -config /srv/certificates/config/server-req.cnf \

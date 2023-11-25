@@ -44,11 +44,12 @@ openssl \
   -in /srv/certificates/client/${user}.csr \
   -CA /srv/certificates/server/server.crt \
   -CAkey /srv/certificates/server/private.key \
-  -rand_serial \
-  -extensions client_extensions \
-  -extfile /srv/certificates/config/client-req.cnf \
+  -set_serial 0x"$(openssl rand -hex 16)" \
+  # -rand_serial \
   -out /srv/certificates/client/${user}.crt \
-  -passin file:/srv/certificates/server/passphrase.txt
+  -passin file:/srv/certificates/server/passphrase.txt \
+  -extensions client_extensions \
+  -extfile /srv/certificates/config/client-req.cnf
 
 # Create p12 as browsers need P12s (contain key and cert)
 openssl pkcs12 \
