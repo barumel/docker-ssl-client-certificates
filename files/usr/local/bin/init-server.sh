@@ -9,13 +9,6 @@ openssl genpkey \
   -out /srv/certificates/server/private.key \
   -pass file:/srv/certificates/server/passphrase.txt
 
-# Extract public key
-openssl pkey \
-  -in /srv/certificates/server/private.key \
-  -pubout \
-  -out /srv/certificates/server/public.key \
-  -passin file:/srv/certificates/server/passphrase.txt
-
 
 # Create the certificate for signing Client Certs
 openssl req \
@@ -23,6 +16,6 @@ openssl req \
   -x509 \
   -config /srv/certificates/config/server-req.cnf \
   -days $CERTIFICATES_SERVER_CERTIFY_DAYS \
-  -key /srv/certificates/server/public.key \
+  -key /srv/certificates/server/private.key \
   -out /srv/certificates/server/server.crt \
   -passin file:/srv/certificates/server/passphrase.txt

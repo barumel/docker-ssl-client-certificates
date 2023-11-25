@@ -31,7 +31,7 @@ openssl genpkey \
 # Create the csr
 openssl req \
   -new \
-  -config /srv/certificates/config/req.cnf \
+  -config /srv/certificates/config/client-req.cnf \
   -key /srv/certificates/client/${user}.key \
   -out /srv/certificates/client/${user}.csr \
   -passin pass:${passphrase}
@@ -42,9 +42,8 @@ openssl x509 \
   -days $CERTIFICATES_SERVER_CERTIFY_DAYS \
   -in /srv/certificates/client/${user}.csr \
   -CA /srv/certificates/server/server.crt \
-  -CAkey /srv/certificates/server/public.key \
+  -CAkey /srv/certificates/server/private.key \
   -rand_serial \
-  -extensions client_extensions \
   -out /srv/certificates/client/${user}.crt \
   -passin file:/srv/certificates/server/passphrase.txt
 

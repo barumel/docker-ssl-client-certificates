@@ -4,6 +4,7 @@
 prompt = no
 distinguished_name = dn
 req_extensions = ext
+x509_extensions = x509_ext
 
 [dn]
 C = ${ENV::CERTIFICATES_SERVER_COUNTRY}
@@ -14,6 +15,8 @@ OU = ${ENV::CERTIFICATES_SERVER_ORGANIZATIONAL_UNIT}
 CN = ${ENV::CERTIFICATES_SERVER_COMMON_NAME}
 
 [ext]
+
+[x509_ext]
 # A CA certificate must contains: CA: true
 # pathlen: 0 - the certificate can only be used to sign end user certificates and not further CAs.
 basicConstraints = critical, CA:true, pathlen:0
@@ -24,8 +27,8 @@ keyUsage = critical, digitalSignature, cRLSign, keyCertSign
 # Used to sign server or client auth
 extendedKeyUsage=serverAuth, clientAuth
 
-https://www.openssl.org/docs/man1.0.2/man5/x509v3_config.html
-subjectKeyIdentifier=hash
-authorityKeyIdentifier=keyid:always,issuer:always
+# https://www.openssl.org/docs/man1.0.2/man5/x509v3_config.html
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer:always
 
-subjectAltName = ${ENV::CERTIFICATES_SERVER_SUBJECT_ALT_NAME}
+# subjectAltName = ${ENV::CERTIFICATES_SERVER_SUBJECT_ALT_NAME}
