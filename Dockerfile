@@ -13,7 +13,6 @@ RUN set -ex; \
     vim
 
 # Create necessary directories
-RUN mkdir -p /srv/certificates/bin
 RUN mkdir -p /srv/certificates/client
 RUN mkdir -p /srv/certificates/server
 # Copy files
@@ -23,8 +22,8 @@ COPY files /
 RUN chown -R keymaster:keymaster /srv/certificates
 
 # Make bin scrips executable
-RUN chmod +x /srv/certificates/bin/*
+RUN chmod +x /usr/local/bin/*
 
 USER keymaster
 
-ENTRYPOINT ["/srv/certificates/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

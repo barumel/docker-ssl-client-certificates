@@ -7,11 +7,11 @@ openssl genpkey \
   -pkeyopt rsa_keygen_bits:4096 \
   -aes-128-cbc \
   -out /srv/certificates/server/private.key \
-  -passout file:/srv/certificates/server/passphrase.txt
+  -pass file:/srv/certificates/server/passphrase.txt
 
 # Extract public key
 openssl pkey \
-  -in /srv/certificates/server/private.key
+  -in /srv/certificates/server/private.key \
   -pubout \
   -out /srv/certificates/server/public.key \
   -passin file:/srv/certificates/server/passphrase.txt

@@ -25,7 +25,7 @@ openssl genpkey \
   -pkeyopt rsa_keygen_bits:4096 \
   -aes-128-cbc \
   -out /srv/certificates/client/${user}.key \
-  -passout pass:${passphrase}
+  -pass pass:${passphrase}
 
 
 # Create the csr
