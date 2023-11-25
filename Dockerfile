@@ -23,7 +23,7 @@ COPY files /
 RUN chown -R keymaster:keymaster /srv/certificates
 
 # Make bin scrips executable
-RUN chmod +x /srv/certificates/bin*
+RUN chmod +x /srv/certificates/bin/*
 
 USER keymaster
 
